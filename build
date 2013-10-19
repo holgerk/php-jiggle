@@ -20,7 +20,15 @@ $content = '';
 foreach ($titles as $i => $title) {
     $code = $codes[$i];
     $code =
-        implode("\n", array_map(function ($line) { return substr($line, 8); }, explode("\n", $code)));
+        implode("\n",
+            array_map(function ($line) {
+                $line = substr($line, 8);
+                // replace assertEquals with echo statement for better readability
+                if (preg_match("#assertEquals\((?<expected>[^,]+), (?<actual>.+)\);#", $line, $matches)) {
+                    return "echo $matches[actual]; // => $matches[expected]";
+                }
+                return $line;
+            }, explode("\n", $code)));
     $content .= "### $title\n";
     $content .= "```php";
     $content .= "$code";
