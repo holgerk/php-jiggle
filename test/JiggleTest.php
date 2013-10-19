@@ -27,7 +27,7 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
     public function testThatDepsCouldBeFactoryFunctions() {
         // <example: Lazy loading with factory functions
         $jiggle = new Jiggle;
-        $jiggle->d1 = function () {
+        $jiggle->d1 = function() {
             return 42;
         };
         $this->assertEquals(42, $jiggle->d1);
@@ -38,7 +38,7 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         // <example: Simple wiring of dependencies
         $jiggle = new Jiggle;
         $jiggle->d1 = 42;
-        $jiggle->d2 = function () use($jiggle) {
+        $jiggle->d2 = function() use($jiggle) {
             return $jiggle->d1;
         };
         $this->assertEquals(42, $jiggle->d2);
@@ -49,7 +49,7 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         // <example: Magic injection of depencies into factory functions
         $jiggle = new Jiggle;
         $jiggle->d1 = 42;
-        $jiggle->d2 = function ($d1) {
+        $jiggle->d2 = function($d1) {
             return $d1;
         };
         $this->assertEquals(42, $jiggle->d2);
@@ -61,7 +61,7 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         $jiggle = new Jiggle;
         $jiggle->d1 = 40;
         $jiggle->d2 = 2;
-        $jiggle->d3 = function () use($jiggle) {
+        $jiggle->d3 = function() use($jiggle) {
             return new D3($jiggle->d1, $jiggle->d2);
         };
         $this->assertEquals(42, $jiggle->d3->sum());
@@ -73,7 +73,7 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         $jiggle = new Jiggle;
         $jiggle->d1 = 40;
         $jiggle->d2 = 2;
-        $jiggle->d3 = function () use($jiggle) {
+        $jiggle->d3 = function() use($jiggle) {
             return $jiggle->create('D3');
         };
         $this->assertEquals(42, $jiggle->d3->sum());
@@ -92,7 +92,7 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
 
     public function testInstantiationWithMagicDepencyInjectionAndNoDeps() {
         $jiggle = new Jiggle;
-        $jiggle->d4 = function () use($jiggle) {
+        $jiggle->d4 = function() use($jiggle) {
             return $jiggle->create('D4');
         };
         $this->assertInstanceOf('D4', $jiggle->d4);
@@ -101,7 +101,7 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
     public function testThatFactoriesCalledOnlyOnce() {
         $jiggle = new Jiggle;
         $callCount = 0;
-        $jiggle->d1 = function () use(&$callCount) {
+        $jiggle->d1 = function() use(&$callCount) {
             $callCount++;
             return 42;
         };
@@ -113,7 +113,7 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
     public function testThatFactoriesCalledLayzily() {
         $jiggle = new Jiggle;
         $called = false;
-        $jiggle->d1 = function () use(&$called) {
+        $jiggle->d1 = function() use(&$called) {
             $called = true;
             return 42;
         };
@@ -128,6 +128,19 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         $number = &$jiggle->d1;
         $number += 21;
         $this->assertEquals(42, $jiggle->d1);
+    }
+
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage Circular dependencies: a -> b -> c -> d -> b
+     */
+    public function testThatCircularDepsCauseAnException() {
+        $jiggle = new Jiggle;
+        $jiggle->a = function($b) { return $b; };
+        $jiggle->b = function($c) { return $c; };
+        $jiggle->c = function($d) { return $d; };
+        $jiggle->d = function($b) { return $b; };
+        $jiggle->a;
     }
 
 

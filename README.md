@@ -16,7 +16,7 @@ $this->assertEquals(42, $jiggle->d1);
 ### Lazy loading with factory functions
 ```php
 $jiggle = new Jiggle;
-$jiggle->d1 = function () {
+$jiggle->d1 = function() {
     return 42;
 };
 $this->assertEquals(42, $jiggle->d1);
@@ -26,7 +26,7 @@ $this->assertEquals(42, $jiggle->d1);
 ```php
 $jiggle = new Jiggle;
 $jiggle->d1 = 42;
-$jiggle->d2 = function () use($jiggle) {
+$jiggle->d2 = function() use($jiggle) {
     return $jiggle->d1;
 };
 $this->assertEquals(42, $jiggle->d2);
@@ -36,7 +36,7 @@ $this->assertEquals(42, $jiggle->d2);
 ```php
 $jiggle = new Jiggle;
 $jiggle->d1 = 42;
-$jiggle->d2 = function ($d1) {
+$jiggle->d2 = function($d1) {
     return $d1;
 };
 $this->assertEquals(42, $jiggle->d2);
@@ -47,7 +47,7 @@ $this->assertEquals(42, $jiggle->d2);
 $jiggle = new Jiggle;
 $jiggle->d1 = 40;
 $jiggle->d2 = 2;
-$jiggle->d3 = function () use($jiggle) {
+$jiggle->d3 = function() use($jiggle) {
     return new D3($jiggle->d1, $jiggle->d2);
 };
 $this->assertEquals(42, $jiggle->d3->sum());
@@ -58,7 +58,7 @@ $this->assertEquals(42, $jiggle->d3->sum());
 $jiggle = new Jiggle;
 $jiggle->d1 = 40;
 $jiggle->d2 = 2;
-$jiggle->d3 = function () use($jiggle) {
+$jiggle->d3 = function() use($jiggle) {
     return $jiggle->create('D3');
 };
 $this->assertEquals(42, $jiggle->d3->sum());

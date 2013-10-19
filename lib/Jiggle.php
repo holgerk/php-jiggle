@@ -4,6 +4,7 @@ class Jiggle {
 
     private $unresolvedDeps = array();
     private $resolvedDeps = array();
+    private $trailOfCurrentlyResolvingDeps = array();
 
     public function create($class) {
         $reflectionClass = new ReflectionClass($class);
@@ -31,10 +32,17 @@ class Jiggle {
 
     public function &__get($name) {
         $this->resolveDep($name);
-        return $this->resolvedDeps[$name];
+        $dep = &$this->resolvedDeps[$name];
+        return $dep;
     }
 
     private function resolveDep($name) {
+        if (in_array($name, $this->trailOfCurrentlyResolvingDeps)) {
+            $path = implode(' -> ', $this->trailOfCurrentlyResolvingDeps);
+            throw new Exception("Circular dependencies: $path -> $name!");
+        }
+        $this->trailOfCurrentlyResolvingDeps[] = $name;
+
         if (isset($this->resolvedDeps[$name])) {
             return;
         } else if (!isset($this->unresolvedDeps[$name])) {
@@ -51,12 +59,14 @@ class Jiggle {
             }
             $this->resolvedDeps[$name] = &$resolved;
         }
+
+        array_pop($this->trailOfCurrentlyResolvingDeps);
     }
 
     private function &fetchDepsFromSignature ($reflectionFunction) {
         $params = array();
         foreach ($reflectionFunction->getParameters() as $param) {
-            $params[] = &$this->{$param->getName()};
+            $params[] = &$this->__get($param->getName());
         }
         return $params;
     }
