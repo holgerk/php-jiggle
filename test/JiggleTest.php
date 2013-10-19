@@ -143,5 +143,24 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         $jiggle->a;
     }
 
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage Dependency is missing: a
+     */
+    public function testThatMissingDepCauseAnException() {
+        $jiggle = new Jiggle;
+        $jiggle->a;
+    }
+
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage Dependency allready exists: a
+     */
+    public function testThatAlreadySetDepCauseAnException() {
+        $jiggle = new Jiggle;
+        $jiggle->a = true;
+        $jiggle->a = false;
+    }
+
 
 }
