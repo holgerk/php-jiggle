@@ -53,7 +53,7 @@ class Jiggle {
             if (is_callable($unresolved)) {
                 $reflection = new ReflectionFunction($unresolved);
                 $params = &$this->fetchDepsFromSignature($reflection);
-                $resolved = &call_user_func_array($unresolved, $params);
+                $resolved = call_user_func_array($unresolved, $params);
             } else {
                 $resolved = &$unresolved;
             }

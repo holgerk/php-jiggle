@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(E_STRICT);
+
 require_once __DIR__ . '/../lib/Jiggle.php';
 
 class D3 {
