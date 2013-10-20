@@ -1,6 +1,6 @@
 # php-jiggle [![Build Status](https://travis-ci.org/holgerk/php-jiggle.png?branch=master)](https://travis-ci.org/holgerk/php-jiggle)
 
-Jiggle is a depency injection container for php &gt;5.3
+Jiggle is a depency injection container for php &gt;&eq;5.3
 
 ## Examples
 

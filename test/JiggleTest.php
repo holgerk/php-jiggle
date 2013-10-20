@@ -2,7 +2,7 @@
 
 error_reporting(E_STRICT);
 
-require_once __DIR__ . '/../lib/Jiggle.php';
+require_once __DIR__ . '/../src/Jiggle.php';
 
 class D3 {
     public function __construct($d1, $d2) {
