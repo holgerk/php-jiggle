@@ -37,7 +37,7 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testThatDepsCouldBeWiredWithoutMagic() {
-        // <example: Simple wiring of dependencies
+        // <example: Basic wiring of dependencies
         $jiggle = new Jiggle;
         $jiggle->d1 = 42;
         $jiggle->d2 = function() use($jiggle) {
@@ -59,7 +59,7 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testInstantiationWithoutMagic() {
-        // <example: Simple instantiation
+        // <example: Basic instantiation
         $jiggle = new Jiggle;
         $jiggle->d1 = 40;
         $jiggle->d2 = 2;
@@ -89,6 +89,18 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         $jiggle->d2 = 2;
         $jiggle->d3 = $jiggle->createFactory('D3');
         $this->assertEquals(42, $jiggle->d3->sum());
+        // example>
+    }
+
+    public function testThatFunctionDepsCouldCalled() {
+        // <example: Basic function dependency
+        $jiggle = new Jiggle;
+        $jiggle->d1 = function() {
+            return function() {
+                return 42;
+            };
+        };
+        $this->assertEquals(42, $jiggle->d1());
         // example>
     }
 

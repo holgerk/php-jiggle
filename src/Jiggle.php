@@ -36,6 +36,11 @@ class Jiggle {
         return $dep;
     }
 
+    public function __call($name, $args) {
+        $function = $this->__get($name);
+        return call_user_func_array($function, $args);
+    }
+
     private function resolveDep($name) {
         if (in_array($name, $this->trailOfCurrentlyResolvingDeps)) {
             $path = implode(' -> ', $this->trailOfCurrentlyResolvingDeps);

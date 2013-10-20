@@ -21,7 +21,7 @@ $jiggle->d1 = function() {
 echo $jiggle->d1; // => 42
 ```
 
-### Simple wiring of dependencies
+### Basic wiring of dependencies
 ```php
 $jiggle = new Jiggle;
 $jiggle->d1 = 42;
@@ -41,7 +41,7 @@ $jiggle->d2 = function($d1) {
 echo $jiggle->d2; // => 42
 ```
 
-### Simple instantiation
+### Basic instantiation
 ```php
 $jiggle = new Jiggle;
 $jiggle->d1 = 40;
@@ -70,6 +70,17 @@ $jiggle->d1 = 40;
 $jiggle->d2 = 2;
 $jiggle->d3 = $jiggle->createFactory('D3');
 echo $jiggle->d3->sum(); // => 42
+```
+
+### Basic function dependency
+```php
+$jiggle = new Jiggle;
+$jiggle->d1 = function() {
+    return function() {
+        return 42;
+    };
+};
+echo $jiggle->d1(); // => 42
 ```
 
 
