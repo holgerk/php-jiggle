@@ -104,6 +104,27 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         // example>
     }
 
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage Dependency allready exists: a
+     */
+    public function testThatAlreadySetDepCauseAnException() {
+        // <example: Existing deps could not replaced by accident
+        $jiggle = new Jiggle;
+        $jiggle->a = true;
+        $jiggle->a = false; // <- throws an exception
+        // example>
+    }
+
+    public function testThatDepsCouldBeReplaced() {
+        // <example: Existing deps could be replaced implicitly
+        $jiggle = new Jiggle;
+        $jiggle->d1 = 21;
+        $jiggle->replace('d1', 42);
+        $this->assertEquals(42, $jiggle->d1);
+        // example>
+    }
+
     public function testInstantiationWithMagicDepencyInjectionAndNoDeps() {
         $jiggle = new Jiggle;
         $jiggle->d4 = function() use($jiggle) {
@@ -164,16 +185,6 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
     public function testThatMissingDepCauseAnException() {
         $jiggle = new Jiggle;
         $jiggle->a;
-    }
-
-    /**
-     * @expectedException Exception
-     * @expectedExceptionMessage Dependency allready exists: a
-     */
-    public function testThatAlreadySetDepCauseAnException() {
-        $jiggle = new Jiggle;
-        $jiggle->a = true;
-        $jiggle->a = false;
     }
 
 

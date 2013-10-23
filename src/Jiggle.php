@@ -23,6 +23,16 @@ class Jiggle {
         };
     }
 
+    public function replace($name, $value) {
+        if (!isset($this->unresolvedDeps[$name])) {
+            throw new Exception("Dependency does not exist: $name!");
+        }
+        if (isset($this->resolvedDeps[$name])) {
+            throw new Exception("Could replace resolved Dependency: $name!");
+        }
+        $this->unresolvedDeps[$name] = &$value;
+    }
+
     public function __set($name, $value) {
         if (isset($this->unresolvedDeps[$name])) {
             throw new Exception("Dependency allready exists: $name!");
