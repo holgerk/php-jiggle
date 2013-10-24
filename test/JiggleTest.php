@@ -187,5 +187,15 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         $jiggle->a;
     }
 
+    public function testThatCircularDepencyMissdetectionIsFixed() {
+        $jiggle = new Jiggle;
+        $jiggle->d1 = 40;
+        $jiggle->d2 = 2;
+        $jiggle->d3 = $jiggle->createFactory('D3');
+        $jiggle->d3;
+        $jiggle->d3;
+        $jiggle->d3;
+    }
+
 
 }

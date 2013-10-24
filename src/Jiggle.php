@@ -56,13 +56,14 @@ class Jiggle {
             $path = implode(' -> ', $this->trailOfCurrentlyResolvingDeps);
             throw new Exception("Circular dependencies: $path -> $name!");
         }
-        $this->trailOfCurrentlyResolvingDeps[] = $name;
 
         if (isset($this->resolvedDeps[$name])) {
             return;
         } else if (!isset($this->unresolvedDeps[$name])) {
             throw new Exception("Dependency is missing: $name!");
         } else {
+            $this->trailOfCurrentlyResolvingDeps[] = $name;
+
             $unresolved = &$this->unresolvedDeps[$name];
             $resolved = null;
             if (is_callable($unresolved)) {
@@ -73,9 +74,9 @@ class Jiggle {
                 $resolved = &$unresolved;
             }
             $this->resolvedDeps[$name] = &$resolved;
-        }
 
-        array_pop($this->trailOfCurrentlyResolvingDeps);
+            array_pop($this->trailOfCurrentlyResolvingDeps);
+        }
     }
 
     private function &fetchDepsFromSignature ($reflectionFunction) {
