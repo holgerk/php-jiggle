@@ -1,7 +1,5 @@
 <?php
 
-error_reporting(E_STRICT);
-
 require_once __DIR__ . '/../src/Jiggle.php';
 
 class D3 {
@@ -36,7 +34,7 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         // example>
     }
 
-    public function testThatDepsCouldBeWiredWithoutMagic() {
+    public function testThatDepsCouldBeWiredWithoutInjection() {
         // <example: Basic wiring of dependencies
         $jiggle = new Jiggle;
         $jiggle->d1 = 42;
@@ -47,8 +45,8 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         // example>
     }
 
-    public function testThatDepsCouldBeWiredWithMagicFactoryInjection() {
-        // <example: Magic injection of depencies into factory functions
+    public function testThatDepsCouldBeWiredWithImplicitSingletonFactoryInjection() {
+        // <example: Implicit injection of depencies into singleton factory functions
         $jiggle = new Jiggle;
         $jiggle->d1 = 42;
         $jiggle->d2 = function($d1) {
@@ -58,7 +56,31 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         // example>
     }
 
-    public function testInstantiationWithoutMagic() {
+    public function testThatDepsCanBeInjectedWithExplicitInjection() {
+        // <example: Explicit injection of depencies into any function
+        $jiggle = new Jiggle;
+        $jiggle->d1 = 40;
+        $jiggle->d2 = 2;
+        $result = $jiggle->inject(function($d1, $d2) {
+            return $d1 + $d2;
+        });
+        $this->assertEquals(42, $result);
+        // example>
+    }
+
+    public function testThatDepsCanBeInjectedWithExplicitInjectionWithOverloadOfDeps() {
+        // <example: Explicit injection with dependency overloading
+        $jiggle = new Jiggle;
+        $jiggle->d1 = 20;
+        $jiggle->d2 = 1000;
+        $result = $jiggle->inject(function($d1, $d2, $d3) {
+            return $d1 + $d2 + $d3;
+        }, array('d2' => 20, 'd3' => 2));
+        $this->assertEquals(42, $result);
+        // example>
+    }
+
+    public function testBasicInstantiation() {
         // <example: Basic instantiation
         $jiggle = new Jiggle;
         $jiggle->d1 = 40;
@@ -70,8 +92,8 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         // example>
     }
 
-    public function testInstantiationWithMagicDepencyInjection() {
-        // <example: Instantiation with magic constructor injection
+    public function testInstantiationWithImplicitDepencyInjection() {
+        // <example: Instantiation with implicit constructor injection
         $jiggle = new Jiggle;
         $jiggle->d1 = 40;
         $jiggle->d2 = 2;
@@ -82,12 +104,12 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         // example>
     }
 
-    public function testInstantiationWithMagicDepencyInjectionShortForm() {
-        // <example: Short form of magic constructor injection
+    public function testInstantiationWithImplicitDepencyInjectionShortForm() {
+        // <example: Short form of implicit constructor injection
         $jiggle = new Jiggle;
         $jiggle->d1 = 40;
         $jiggle->d2 = 2;
-        $jiggle->d3 = $jiggle->createFactory('D3');
+        $jiggle->d3 = $jiggle->singleton('D3');
         $this->assertEquals(42, $jiggle->d3->sum());
         // example>
     }
@@ -122,6 +144,15 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         $jiggle->d1 = 21;
         $jiggle->replace('d1', 42);
         $this->assertEquals(42, $jiggle->d1);
+        // example>
+    }
+
+    public function testThatContainerSupportsIsset() {
+        // <example: Isset support
+        $jiggle = new Jiggle;
+        $jiggle->d1 = 42;
+        $this->assertTrue(isset($jiggle->d1));
+        $this->assertFalse(isset($jiggle->d2));
         // example>
     }
 
@@ -191,7 +222,7 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         $jiggle = new Jiggle;
         $jiggle->d1 = 40;
         $jiggle->d2 = 2;
-        $jiggle->d3 = $jiggle->createFactory('D3');
+        $jiggle->d3 = $jiggle->singleton('D3');
         $jiggle->d3;
         $jiggle->d3;
         $jiggle->d3;

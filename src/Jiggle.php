@@ -6,6 +6,12 @@ class Jiggle {
     private $resolvedDeps = array();
     private $trailOfCurrentlyResolvingDeps = array();
 
+    public function inject($callable, $overloadedDeps = array()) {
+        $reflection = new ReflectionFunction($callable);
+        $params = &$this->fetchDepsFromSignature($reflection, $overloadedDeps);
+        return call_user_func_array($callable, $params);
+    }
+
     public function create($class) {
         $reflectionClass = new ReflectionClass($class);
         $reflectionMethod = $reflectionClass->getConstructor();
@@ -16,7 +22,7 @@ class Jiggle {
         return $reflectionClass->newInstanceArgs($params);
     }
 
-    public function createFactory($class) {
+    public function singleton($class) {
         $self = $this;
         return function() use($self, $class) {
             return $self->create($class);
@@ -33,6 +39,13 @@ class Jiggle {
         $this->unresolvedDeps[$name] = &$value;
     }
 
+    /**
+     * @deprecated
+     */
+    public function createFactory($class) {
+        throw new Exception('Deprecated: createFactory is renamed to singleton!');
+    }
+
     public function __set($name, $value) {
         if (isset($this->unresolvedDeps[$name])) {
             throw new Exception("Dependency allready exists: $name!");
@@ -44,6 +57,10 @@ class Jiggle {
         $this->resolveDep($name);
         $dep = &$this->resolvedDeps[$name];
         return $dep;
+    }
+
+    public function __isset($name) {
+        return isset($this->unresolvedDeps[$name]);
     }
 
     public function __call($name, $args) {
@@ -79,10 +96,14 @@ class Jiggle {
         }
     }
 
-    private function &fetchDepsFromSignature ($reflectionFunction) {
+    private function &fetchDepsFromSignature($reflectionFunction, $overloadedDeps = array()) {
         $params = array();
         foreach ($reflectionFunction->getParameters() as $param) {
-            $params[] = &$this->__get($param->getName());
+            if (array_key_exists($param->getName(), $overloadedDeps)) {
+                $params[] = $overloadedDeps[$param->getName()];
+            } else {
+                $params[] = &$this->__get($param->getName());
+            }
         }
         return $params;
     }
