@@ -5,6 +5,7 @@ class Jiggle {
     private $unresolvedDeps = array();
     private $resolvedDeps = array();
     private $trailOfCurrentlyResolvingDeps = array();
+    private $resolver = null;
 
     /**
      * Create a singleton factory for the given class
@@ -55,7 +56,7 @@ class Jiggle {
     /**
      * Replace an existing dependency
      *
-     * Usefull if one whant mock some part of a bigger system or for clients to replace an
+     * Usefull if one would like to mock some part of a bigger system or for clients to replace an
      * unwanted implementation.
      *
      * @param  string $name  of the dependency to replace
@@ -69,6 +70,19 @@ class Jiggle {
             throw new Exception("Could replace resolved Dependency: $name!");
         }
         $this->unresolvedDeps[$name] = &$value;
+    }
+
+    /**
+     * Let one provide a callable which is called if a dependency is not resolvable
+     *
+     * If the provided resolver can resolve the dependency it should simply return it.
+     * If the dependency could not resolved the resolver needs to throw an exception,
+     * otherwise the dependency would be resolved to null.
+     *
+     * @param  callable $callable the resolver callabe
+     */
+    public function resolver($callable) {
+        $this->resolver = $callable;
     }
 
     /**
@@ -109,7 +123,11 @@ class Jiggle {
         if (isset($this->resolvedDeps[$name])) {
             return;
         } else if (!isset($this->unresolvedDeps[$name])) {
-            throw new Exception("Dependency is missing: $name!");
+            if (isset($this->resolver)) {
+                $this->resolvedDeps[$name] = call_user_func($this->resolver, $name);
+            } else {
+                throw new Exception("Dependency is missing: $name!");
+            }
         } else {
             $this->trailOfCurrentlyResolvingDeps[] = $name;
 

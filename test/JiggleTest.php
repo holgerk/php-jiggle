@@ -156,6 +156,20 @@ class JiggleTest extends PHPUnit_Framework_TestCase {
         // example>
     }
 
+    public function testThatResolverCouldProvidedWhichIsIvokedToResolveUnresolvableDeps() {
+        // <example: Resolver is called for unresolvable deps
+        $jiggle = new Jiggle;
+        $jiggle->resolver(function($dependencyName) {
+            if ($dependencyName == 'd2') {
+                return 42;
+            }
+            throw new Exception("Could not resolve dependency: $dependencyName!");
+        });
+        $jiggle->d1 = function($d2) { return $d2; };
+        $this->assertEquals(42, $jiggle->d1);
+        // example>
+    }
+
     public function testInstantiationWithMagicDepencyInjectionAndNoDeps() {
         $jiggle = new Jiggle;
         $jiggle->d4 = function() use($jiggle) {
